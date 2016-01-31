@@ -129,7 +129,6 @@ def main():
     # Server switch
     parser.add_argument('--server', '-s', help="The ACME server to use", default=LETS_ENCRYPT_PRODUCTION)
     parser.add_argument('--account', '-a', help="The account file to use or create", default=DEFAULT_ACCOUNT_PATH)
-    parser.set_defaults(func=lambda *args: parser.print_help())
 
     # Account creation
     register = subparsers.add_parser(
@@ -171,6 +170,9 @@ def main():
 
     # Parse
     args = parser.parse_args()
+    if not hasattr(args, 'func'):
+        parser.print_help()
+        sys.exit(0)
 
     # Set up logging
     root = logging.getLogger('manuale')
