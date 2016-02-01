@@ -74,6 +74,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
         os.makedirs(output_path, exist_ok=True)
         cert_path = os.path.join(output_path, domains[0] + '.crt')
         chain_path = os.path.join(output_path, domains[0] + '.chain.crt')
+        intermediate_path = os.path.join(output_path, domains[0] + '.intermediate.crt')
         key_path = os.path.join(output_path, domains[0] + '.pem')
 
         with open(key_path, 'wb') as f:
@@ -89,6 +90,11 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
             if result.intermediate:
                 f.write(export_pem_certificate(load_der_certificate(result.intermediate)))
             logger.info("Wrote certificate with intermediate to {}".format(f.name))
+
+        if result.intermediate:
+            with open(intermediate_path, 'wb') as f:
+                f.write(export_pem_certificate(load_der_certificate(result.intermediate)))
+                logger.info("Wrote intermediate certificate to {}".format(f.name))
     except IOError as e:
         logger.error("Failed to write certificate or key. Going to print them for you instead.")
         logger.error("")
