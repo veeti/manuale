@@ -2,10 +2,6 @@
 The domain authorization command. Authorizations last up to 300 days on the
 production Let's Encrypt service at the time of writing, so it makes sense to
 separate certificate issuance from ownership verification.
-
-TODO: Authorizing multiple domains at the same time once the ACME API
-supports finding existing authorizations, complete or pending. Until then, it
-would be too easy to lock yourself out because of strict rate limits.
 """
 
 import logging
