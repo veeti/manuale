@@ -12,6 +12,7 @@ from .account import deserialize as deserialize_account
 from .authorize import authorize
 from .issue import issue
 from .register import register
+from .revoke import revoke
 from .errors import ManualeError
 import manuale
 
@@ -75,6 +76,12 @@ yourself. You need to authorize both as well.
 Certificate issuance has a server-side rate limit. Don't overdo it.
 """
 
+DESCRIPTION_REVOKE = \
+"""
+Revokes a certificate. The certificate must have been issued using the
+current account.
+"""
+
 # Defaults
 LETS_ENCRYPT_PRODUCTION = "https://acme-v01.api.letsencrypt.org/"
 DEFAULT_ACCOUNT_PATH = 'account.json'
@@ -98,6 +105,14 @@ def _issue(args):
         key_file=args.key_file,
         csr_file=args.csr_file,
         output_path=args.output
+    )
+
+def _revoke(args):
+    account = load_account(args.account)
+    revoke(
+        server=args.server,
+        account=account,
+        certificate=args.certificate
     )
 
 def load_account(path):
@@ -163,6 +178,16 @@ def main():
     issue.add_argument('--csr-file', help="Existing signing request to use")
     issue.add_argument('--output', '-o', help="The output directory for created objects", default='.')
     issue.set_defaults(func=_issue)
+
+    # Certificate revocation
+    revoke = subparsers.add_parser(
+        'revoke',
+        help="Revoke an issued certificate",
+        description=DESCRIPTION_REVOKE,
+        formatter_class=Formatter,
+    )
+    revoke.add_argument('certificate', help="The certificate file to revoke")
+    revoke.set_defaults(func=_revoke)
 
     # Version
     version = subparsers.add_parser('version', help="Show the version number")

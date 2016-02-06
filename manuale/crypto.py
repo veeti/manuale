@@ -135,8 +135,30 @@ def load_der_certificate(data):
     """
     return x509.load_der_x509_certificate(data, default_backend())
 
+def load_pem_certificate(data):
+    """
+    Loads a PEM X.509 certificate.
+    """
+    return x509.load_pem_x509_certificate(data, default_backend())
+
+def get_certificate_domains(cert):
+    """
+    Gets a list of all Subject Alternative Names in the specified certificate.
+    """
+    for ext in cert.extensions:
+        ext = ext.value
+        if isinstance(ext, x509.SubjectAlternativeName):
+            return ext.get_values_for_type(x509.DNSName)
+    return []
+
 def export_pem_certificate(cert):
     """
     Exports a X.509 certificate as PEM.
     """
     return cert.public_bytes(Encoding.PEM)
+
+def export_certificate_for_acme(cert):
+    """
+    Exports a X.509 certificate for the ACME protocol (JOSE Base64 DER).
+    """
+    return jose_b64(cert.public_bytes(Encoding.DER))

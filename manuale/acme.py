@@ -141,6 +141,15 @@ class Acme:
             )
         raise AcmeError(response)
 
+    def revoke_certificate(self, cert):
+        response = self.post('/acme/revoke-cert', {
+            'resource': 'revoke-cert',
+            'certificate': cert,
+        })
+        if response.status_code == 200:
+            return True
+        raise AcmeError(response)
+
     def get(self, path, headers=None):
         _headers = DEFAULT_HEADERS.copy()
         if headers:
