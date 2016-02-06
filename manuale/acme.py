@@ -42,15 +42,12 @@ class Acme:
         """
         Registers the current account on the server.
         """
-        header, protected_header = self.get_headers()
-        request = sign_request(self.key, header, protected_header, {
+        response = self.post('/acme/new-reg', {
             'resource': 'new-reg',
             'contact': [
-                "mailto:{}".format(email),
+                "mailto:{}".format(email)
             ],
         })
-
-        response = self.post('/acme/new-reg', request)
         uri = response.headers.get('Location')
         if response.status_code == 201:
             self.account.uri = uri
@@ -71,12 +68,9 @@ class Acme:
         """
         Gets available account information from the server.
         """
-        header, protected_header = self.get_headers()
-        request = sign_request(self.key, header, protected_header, {
-            'resource': 'reg'
+        response = self.post(self.account.uri, {
+            'resource': 'reg',
         })
-
-        response = self.post(self.account.uri, request)
         if str(response.status_code).startswith('2'):
             return _json(response)
         raise AcmeError(response)
@@ -87,10 +81,8 @@ class Acme:
         """
         params = params or {}
         params['resource'] = 'reg'
-        header, protected_header = self.get_headers()
-        request = sign_request(self.key, header, protected_header, params)
 
-        response = self.post(self.account.uri, request)
+        response = self.post(self.account.uri, params)
         if str(response.status_code).startswith('2'):
             return True
         raise AcmeError(response)
@@ -99,13 +91,10 @@ class Acme:
         """
         Requests a new authorization for the specified domain.
         """
-        header, protected_header = self.get_headers()
-        request = sign_request(self.key, header, protected_header, {
+        response = self.post('/acme/new-authz', {
             'resource': 'new-authz',
-            'identifier': { 'type': 'dns', 'value': domain },
+            'identifier': { 'type': 'dns', 'value': domain }
         })
-
-        response = self.post('/acme/new-authz', request)
         if response.status_code == 201:
             return NewAuthorizationResult(_json(response), response.headers.get('Location'))
         raise AcmeError(response)
@@ -114,14 +103,11 @@ class Acme:
         """
         Marks the specified validation as complete.
         """
-        header, protected_header = self.get_headers()
-        request = sign_request(self.key, header, protected_header, {
+        response = self.post(uri, {
             'resource': 'challenge',
             'type': _type,
             'keyAuthorization': key_authorization,
         })
-
-        response = self.post(uri, request)
         if str(response.status_code).startswith('2'):
             return True
         raise AcmeError(response)
@@ -137,13 +123,11 @@ class Acme:
             raise AcmeError(e)
 
     def issue_certificate(self, csr):
-        header, protected = self.get_headers()
         http_headers = { 'Accept': 'application/pkix-cert' }
-        request = sign_request(self.key, header, protected, {
-            'resource': 'new-cert', 'csr': csr,
-        })
-
-        response = self.post('/acme/new-cert', request, headers=http_headers)
+        response = self.post('/acme/new-cert', {
+            'resource': 'new-cert',
+            'csr': csr,
+        }, headers=http_headers)
         if response.status_code == 201:
             # Get the issuer certificate
             chain = _get_link(response.headers.get('Link'), 'up')
@@ -168,6 +152,10 @@ class Acme:
         _headers['Content-Type'] = 'application/json'
         if headers:
             _headers.update(headers)
+
+        header, protected = self.get_headers()
+        body = sign_request(self.account.key, header, protected, body)
+
         return requests.post(self.path(path), data=body, headers=_headers)
 
     def path(self, path):
