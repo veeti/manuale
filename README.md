@@ -1,6 +1,6 @@
 # ManuaLE
 
-manuale is a lightweight [Let's Encrypt](https://letsencrypt.org)/[ACME](https://github.com/ietf-wg-acme/acme/) client designed for a manual workflow. It contains no automation features whatsoever and is intended to be called by a human.
+manuale is a fully manual [Let's Encrypt](https://letsencrypt.org)/[ACME](https://github.com/ietf-wg-acme/acme/) client for advanced users. It is intended to be used by a human in a manual workflow and contains no automation features whatsoever.
 
 ## Why?
 
@@ -14,9 +14,9 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 ## Features
 
-* Simple interface with no hoops to jump through. Keys and certificate signing requests are automatically generated: no more cryptic OpenSSL one-liners.
+* Simple interface with no hoops to jump through. Keys and certificate signing requests are automatically generated: no more cryptic OpenSSL one-liners. (However, you do need to know what to do with generated certificates and keys yourself!)
 
-* Support for DNS validation. No need to figure out how to serve challenge files from a live domain. (In fact, that's the only validation method supported.)
+* Support for DNS validation. No need to figure out how to serve challenge files from a live domain. (In fact, that's the only validation method supported).
 
 * Authorization is separate from certificate issuance. Authorizations last for months on Let's Encrypt: there's no need to waste time validating the domain every time you renew the certificate.
 
@@ -24,21 +24,52 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 * Awful, undiscoverable name.
 
-* And finally, if the `openssl` binary is your spirit animal, you can still bring your own keys and/or CSR's. Everybody wins.
+* And finally, if the `openssl` binary is your spirit animal after all, you can still bring your own keys and/or CSR's. Everybody wins.
 
 ## Installation
 
-For now, install through the repository:
+Get it from your package manager if available. If not, install it from [PyPI](https://pypi.python.org/pypi/manuale) with `pip3 install manuale`.
+
+Or live on the edge with the git repository:
 
     git clone https://github.com/veeti/manuale ~/.manuale
     cd ~/.manuale
-    virtualenv3 env
+    python3 -m venv env
     env/bin/python setup.py install
     ln -s env/bin/manuale ~/.bin/
 
-You need Python 3. It's 2016.
+Python 3.3 or above is required.
 
-(Assuming that you have a `~/.bin` directory that's in your `PATH`.)
+## Quick start
+
+Register an account (once):
+
+    $ manuale register me@example.com
+
+Authorize one or more domains:
+
+    $ manuale authorize example.com
+    DNS verification required. Make sure these records are in place:
+      _acme-challenge.example.com. "(some random gibberish)"
+    Press enter to continue.
+    ...
+    1 domain(s) authorized. Let's Encrypt!
+
+Get your certificate:
+
+    $ manuale issue --output certs/ example.com
+    ...
+    Certificate issued.
+
+    Expires: 2016-06-01
+     SHA256: (more random gibberish)
+
+    Wrote key to certs/example.com.pem
+    Wrote certificate to certs/example.com.crt
+    Wrote certificate with intermediate to certs/example.com.chain.crt
+    Wrote intermediate certificate to certs/example.com.intermediate.crt
+
+Set yourself a reminder for renewal!
 
 ## Usage
 
@@ -48,17 +79,18 @@ Once that's done, you'll have your account saved in `account.json` in the curren
 
 `manuale` expects the account file to be in your working directory by default, so you'll probably want to make a specific directory to do all your certificate stuff in. Likewise, created certificates get saved in the current path by default.
 
-Next up, verify your the domains you want a certificate for one-by-one with `manuale authorize [domain]`. This will show you the DNS record you need to create and wait for you to do it. For example, you might do it for `example.com` and `www.example.com`.
+Next up, verify the domains you want a certificate for with `manuale authorize [domain]`. This will show you the DNS records you need to create and wait for you to do it. For example, you might do it for `example.com` and `www.example.com`.
 
 Once that's done, you can finally get down to business. Run `manuale issue example.com www.example.com` to get your certificate. It'll save the key, certificate and certificate with intermediate to the working directory.
 
-There's plenty of documentation inside each command. Run `manuale [command] -h` for details.
+There's plenty of documentation inside each command. Run `manuale -h` for a list of commands and `manuale [command] -h` for details.
 
 ## See also
 
-* [Best practices](https://wiki.mozilla.org/Security/Server_Side_TLS)
-* [Configuration generator](https://mozilla.github.io/server-side-tls/ssl-config-generator/)
-* [Test your config](https://www.ssllabs.com/ssltest/)
+* [Best practices for server configuration](https://wiki.mozilla.org/Security/Server_Side_TLS)
+* [Configuration generator for common servers](https://mozilla.github.io/server-side-tls/ssl-config-generator/)
+* [Test your server](https://www.ssllabs.com/ssltest/)
+* [Other clients](https://community.letsencrypt.org/t/list-of-client-implementations/2103)
 
 ## License
 

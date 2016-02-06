@@ -11,7 +11,7 @@ setup(
     version='0.1.0.dev1',
 
     license='MIT',
-    description="Let's Encrypt/ACME client designed for a manual workflow",
+    description="A fully manual Let's Encrypt/ACME client",
     long_description=readme,
     url='https://github.com/veeti/manuale',
     author="Veeti Paananen",
