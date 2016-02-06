@@ -8,7 +8,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='manuale',
-    version='0.1.0.dev1',
+    version='1.0.0',
 
     license='MIT',
     description="A fully manual Let's Encrypt/ACME client",
