@@ -42,6 +42,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
         logger.info("Generating a {} bit RSA key. This might take a second.".format(key_size))
         certificate_key = generate_rsa_key(key_size)
         logger.info("Key generated.")
+        logger.info("")
 
     # Load CSR or generate
     if csr_file:
@@ -67,8 +68,10 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
         certificate = load_der_certificate(result.certificate)
 
         # Print some neat info
+        logger.info("")
         logger.info("  Expires: {}".format(certificate.not_valid_after.strftime(EXPIRATION_FORMAT)))
         logger.info("   SHA256: {}".format(binascii.hexlify(certificate.fingerprint(SHA256())).decode('ascii')))
+        logger.info("")
 
         # Write the key, certificate and full chain
         os.makedirs(output_path, exist_ok=True)
