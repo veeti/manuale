@@ -11,6 +11,7 @@ from .account import Account
 from .account import deserialize as deserialize_account
 from .authorize import authorize
 from .issue import issue
+from .info import info
 from .register import register
 from .revoke import revoke
 from .errors import ManualeError
@@ -81,6 +82,11 @@ Revokes a certificate. The certificate must have been issued using the
 current account.
 """
 
+DESCRIPTION_INFO = \
+"""
+Shows raw registration info for the current account.
+"""
+
 # Defaults
 LETS_ENCRYPT_PRODUCTION = "https://acme-v01.api.letsencrypt.org/"
 DEFAULT_ACCOUNT_PATH = 'account.json'
@@ -113,6 +119,10 @@ def _revoke(args):
         account=account,
         certificate=args.certificate
     )
+
+def _info(args):
+    account = load_account(args.account)
+    info(args.server, account)
 
 def load_account(path):
     # Show a more descriptive message if the file doesn't exist.
@@ -187,6 +197,15 @@ def main():
     )
     revoke.add_argument('certificate', help="The certificate file to revoke")
     revoke.set_defaults(func=_revoke)
+
+    # Account info
+    info = subparsers.add_parser(
+        'info',
+        help="Shows account information from the service",
+        description=DESCRIPTION_INFO,
+        formatter_class=Formatter,
+    )
+    info.set_defaults(func=_info)
 
     # Version
     version = subparsers.add_parser('version', help="Show the version number")
