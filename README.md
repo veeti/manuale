@@ -28,7 +28,11 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 ## Installation
 
-Get it from your package manager if available. If not, install it from [PyPI](https://pypi.python.org/pypi/manuale) with `pip3 install manuale`.
+Get it from your package manager if available:
+
+* [Arch Linux](https://aur4.archlinux.org/packages/manuale/)
+
+If not, install it from [PyPI](https://pypi.python.org/pypi/manuale) with `pip3 install manuale`.
 
 Or live on the edge with the git repository:
 
