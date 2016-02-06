@@ -15,51 +15,81 @@ from .helpers import confirm
 
 logger = logging.getLogger(__name__)
 
-def authorize(server, account, domain):
+def authorize(server, account, domains):
     acme = Acme(server, account)
     thumbprint = generate_jwk_thumbprint(account.key)
 
     try:
-        logger.info("Requesting challenge for {}.".format(domain))
-        authorization = acme.new_authorization(domain)
+        # Get pending authorizations for each domain
+        authz = {}
+        for domain in domains:
+            logger.info("Requesting challenge for {}.".format(domain))
+            created = acme.new_authorization(domain)
+            auth = created.contents
+            auth['uri'] = created.uri
 
-        # Find the dns-01 challenge.
-        challenge = None
-        for ch in authorization.contents.get('challenges', []):
-            if ch['type'] == 'dns-01':
-                challenge = ch
-                break
-        if not challenge:
-            logger.error("Manuale only supports the DNS-01 challenge. The server did not return one.")
-            raise ManualeError()
+            # Find the DNS challenge
+            try:
+                auth['challenge'] = [ch for ch in auth.get('challenges', []) if ch.get('type') == 'dns-01'][0]
+            except IndexError:
+                raise ManualeError("Manuale only supports the dns-01 challenge. The server did not return one.")
 
-        # Build key authorization and DNS token value.
-        keyauth = "{}.{}".format(challenge['token'], thumbprint)
-        hash = hashlib.sha256()
-        hash.update(keyauth.encode('ascii'))
-        txt = jose_b64(hash.digest())
+            auth['key_authorization'] = "{}.{}".format(auth['challenge'].get('token'), thumbprint)
+            digest = hashlib.sha256()
+            digest.update(auth['key_authorization'].encode('ascii'))
+            auth['txt_record'] = jose_b64(digest.digest())
 
-        # Print instructions and wait.
-        logger.info("DNS verification required. Make sure this TXT record is in place:")
-        logger.info("  _acme-challenge.{}. \"{}\"".format(domain, txt))
-        logger.info("(Give it a minute or two.)")
+            authz[domain] = auth
+
+        logger.info("")
+        logger.info("DNS verification required. Make sure these records are in place:")
+        logger.info("")
+        for domain in domains:
+            auth = authz[domain]
+            logger.info("  _acme-challenge.{}. \"{}\"".format(domain, auth['txt_record']))
+        logger.info("")
         input("Press enter to continue.")
 
-        # Submit challenge and poll.
-        acme.validate_authorization(challenge['uri'], 'dns-01', keyauth)
-        while True:
-            logger.info("Waiting for verification. Sleeping for 5 seconds.")
-            time.sleep(5)
+        # Verify each domain
+        done, failed = set(), set()
+        for domain in domains:
+            logger.info("")
+            auth = authz[domain]
+            challenge = auth['challenge']
+            acme.validate_authorization(challenge['uri'], 'dns-01', auth['key_authorization'])
 
-            response = acme.get_authorization(authorization.uri)
-            status = response.get('status')
-            if status == 'valid':
-                logger.info("{} verified! According to the server, this authorization lasts until {}.".format(domain, response.get('expires', '(not provided)')))
-                logger.info("Let's Encrypt!")
-                break
-            elif status != 'pending':
-                logger.error("Verification failed with status '{}'. Aborting.".format(status))
-                raise ManualeError()
+            while True:
+                logger.info("{}: waiting for verification. Checking in 5 seconds.".format(domain))
+                time.sleep(5)
+
+                response = acme.get_authorization(auth['uri'])
+                status = response.get('status')
+                if status == 'valid':
+                    done.add(domain)
+                    logger.info("{}: OK! Authorization lasts until {}.".format(domain, response.get('expires', '(not provided)')))
+                    break
+                elif status != 'pending':
+                    failed.add(domain)
+
+                    # Failed, dig up details
+                    error_type, error_reason = "unknown", "N/A"
+                    try:
+                        challenge = [ch for ch in response.get('challenges', []) if ch.get('type') == 'dns-01'][0]
+                        error_type = challenge.get('error').get('type')
+                        error_reason = challenge.get('error').get('detail')
+                    except (ValueError, IndexError, AttributeError, TypeError):
+                        pass
+
+                    logger.info("{}: {} ({})".format(domain, error_reason, error_type))
+                    break
+
+        logger.info("")
+        if failed:
+            logger.info("{} domain(s) authorized, {} failed.".format(len(done), len(failed)))
+            logger.info("Authorized: {}".format(' '.join(done) or "N/A"))
+            logger.info("Failed: {}".format(' '.join(failed)))
+        else:
+            logger.info("{} domain(s) authorized. Let's Encrypt!".format(len(done)))
     except IOError as e:
         logger.error("A connection or service error occurred. Aborting.")
         raise ManualeError(e)

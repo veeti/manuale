@@ -37,8 +37,8 @@ contains your private key, and you need it to get certificates!
 
 DESCRIPTION_AUTHORIZE = \
 """
-Authorizes a single domain for your account through DNS verification. You will
-need to set a DNS record on your domain as prompted.
+Authorizes a domain or multiple domains for your account through DNS
+verification. You will need to set DNS records as prompted.
 
 After authorizing a domain, you can issue certificates for it. Authorizations
 can last for a long time, so you might not need to do this every time you want
@@ -147,7 +147,7 @@ def main():
         description=DESCRIPTION_AUTHORIZE,
         formatter_class=Formatter,
     )
-    authorize.add_argument('domain', help="A domain name to authorize")
+    authorize.add_argument('domain', help="One or more domain names to authorize", nargs='+')
     authorize.set_defaults(func=_authorize)
 
     # Certificate issuance
