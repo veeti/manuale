@@ -56,7 +56,6 @@ DESCRIPTION_ISSUE = \
 Issues a certificate for one or more domains. Hopefully needless to say, you
 must have valid authorizations for the domains you specify first.
 
-
 This will generate a new RSA key and CSR for you. But if you want, you can
 bring your own with the --key-file and --csr-file attributes. You can also set
 a custom --key-size. (Don't try something stupid like 512, the server won't
