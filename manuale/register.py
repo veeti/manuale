@@ -55,6 +55,7 @@ def register(server, account_path, email):
     directory = os.path.dirname(os.path.abspath(account_path))
     os.makedirs(directory, exist_ok=True)
     with open(account_path, 'wb') as f:
+        os.chmod(account_path, 0o600)
         f.write(account.serialize())
 
     logger.info("Wrote account to {}.".format(account_path))

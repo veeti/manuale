@@ -81,6 +81,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
         key_path = os.path.join(output_path, domains[0] + '.pem')
 
         with open(key_path, 'wb') as f:
+            os.chmod(key_path, 0o600)
             f.write(export_rsa_key(certificate_key))
             logger.info("Wrote key to {}".format(f.name))
 
