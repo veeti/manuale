@@ -1,4 +1,4 @@
-# 1.0.1 (unreleased)
+# 1.0.1 (February 9, 2016)
 
 * Private key files are now created with read permission for the owner only (`0600` mode).
 
