@@ -46,7 +46,7 @@ def authorize(server, account, domains):
         logger.info("")
         for domain in domains:
             auth = authz[domain]
-            logger.info("  _acme-challenge.{}. \"{}\"".format(domain, auth['txt_record']))
+            logger.info("  _acme-challenge.{}.  IN TXT  \"{}\"".format(domain, auth['txt_record']))
         logger.info("")
         input("Press enter to continue.")
 
