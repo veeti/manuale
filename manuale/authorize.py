@@ -42,7 +42,7 @@ def authorize(server, account, domains):
             authz[domain] = auth
 
         logger.info("")
-        logger.info("DNS verification required. Make sure these records are in place:")
+        logger.info("DNS verification required. Make sure these TXT records are in place:")
         logger.info("")
         for domain in domains:
             auth = authz[domain]
