@@ -53,12 +53,12 @@ class Acme:
             self.account.uri = uri
 
             # Find terms of service from link headers
-            terms = _get_link(response.headers.get('Link'), 'terms-of-service')
+            terms = response.links.get('terms-of-service')
 
             return RegistrationResult(
                 contents=_json(response),
                 uri=uri,
-                terms=terms
+                terms=(terms['url'] if terms else None)
             )
         elif response.status_code == 409:
             raise AccountAlreadyExistsError(response, uri)
@@ -130,9 +130,9 @@ class Acme:
         }, headers=http_headers)
         if response.status_code == 201:
             # Get the issuer certificate
-            chain = _get_link(response.headers.get('Link'), 'up')
+            chain = response.links.get('up')
             if chain:
-                chain = requests.get(chain, headers=DEFAULT_HEADERS).content
+                chain = requests.get(chain['url'], headers=DEFAULT_HEADERS).content
 
             return IssuanceResult(
                 response.content,
@@ -178,13 +178,6 @@ RegistrationResult = namedtuple('RegistrationResult', 'contents uri terms')
 NewAuthorizationResult = namedtuple('NewAuthorizationResult', 'contents uri')
 IssuanceResult = namedtuple('IssuanceResult', 'certificate location intermediate')
 
-
-def _get_link(header, type):
-    links = (header or '').split(',')
-    for link in links:
-        link = link.strip()
-        if type in link:
-            return link[1:link.index('>')]
 
 def _json(response):
     try:
