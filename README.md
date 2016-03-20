@@ -28,13 +28,21 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 ## Installation
 
-Get it from your package manager if available:
+Python 3.3 or above is required.
 
-* [Arch Linux](https://aur4.archlinux.org/packages/manuale/)
+### Using your package manager
 
-If not, install it from [PyPI](https://pypi.python.org/pypi/manuale) with `pip3 install manuale`.
+Currently available for [Arch Linux](https://aur.archlinux.org/packages/manuale/).
 
-Or live on the edge with the git repository:
+### Using pip
+
+You can install the package from [PyPI](https://pypi.python.org/pypi/manuale) using the `pip` tool. To do so, run `pip3 install manuale`.
+
+If you're not using Windows or OS X pip may need to compile some of the dependencies. In this case, you need a compiler and development headers for Python, OpenSSL and libffi installed.
+
+On Debian-based distributions, these will typically be `gcc python3-dev libssl-dev libffi-dev`, and on RPM-based distributions `gcc python3-devel openssl-devel libffi-devel`.
+
+### From the git repository
 
     git clone https://github.com/veeti/manuale ~/.manuale
     cd ~/.manuale
@@ -42,7 +50,7 @@ Or live on the edge with the git repository:
     env/bin/python setup.py install
     ln -s env/bin/manuale ~/.bin/
 
-Python 3.3 or above is required.
+(Assuming you have a `~/.bin/` directory in your `$PATH`).
 
 ## Quick start
 
@@ -54,7 +62,7 @@ Authorize one or more domains:
 
     $ manuale authorize example.com
     DNS verification required. Make sure these records are in place:
-      _acme-challenge.example.com. "(some random gibberish)"
+      _acme-challenge.example.com. IN TXT "(some random gibberish)"
     Press enter to continue.
     ...
     1 domain(s) authorized. Let's Encrypt!
