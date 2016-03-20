@@ -1,3 +1,7 @@
+# 1.0.2 (March 20, 2016)
+
+* The authorization command now outputs proper DNS record lines.
+
 # 1.0.1 (February 9, 2016)
 
 * Private key files are now created with read permission for the owner only (`0600` mode).
