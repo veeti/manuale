@@ -32,7 +32,11 @@ Python 3.3 or above is required.
 
 ### Using your package manager
 
-Currently available for [Arch Linux](https://aur.archlinux.org/packages/manuale/).
+* Arch Linux: in the [AUR](https://aur.archlinux.org/packages/manuale).
+
+* Fedora Linux: `dnf install manuale`.
+
+* Package maintainers wanted: your package here?
 
 ### Using pip
 
