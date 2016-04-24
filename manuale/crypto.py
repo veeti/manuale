@@ -14,6 +14,9 @@ from cryptography.hazmat.primitives.asymmetric.rsa import (
     generate_private_key,
     RSAPrivateKey,
 )
+from cryptography.hazmat.primitives.asymmetric.ec import (
+    EllipticCurvePrivateKey,
+)
 from cryptography.hazmat.primitives.serialization import (
     load_pem_private_key,
     Encoding,
@@ -86,20 +89,21 @@ def sign_request(key, header, protected_header, payload):
         'signature': jose_b64(signer.finalize()),
     })
 
-def load_rsa_key(data):
+def load_private_key(data):
     """
-    Loads a PEM-encoded RSA private key.
+    Loads a PEM-encoded private key.
     """
     key = load_pem_private_key(data, password=None, backend=default_backend())
-    if not isinstance(key, RSAPrivateKey):
-        raise ValueError("Key is not a private RSA key.")
-    elif key.key_size < 2048:
+    if not isinstance(key, (RSAPrivateKey, EllipticCurvePrivateKey)):
+        raise ValueError("Key is not a private RSA or EC key.")
+    elif isinstance(key, RSAPrivateKey) and key.key_size < 2048:
         raise ValueError("The key must be 2048 bits or longer.")
+
     return key
 
-def export_rsa_key(key):
+def export_private_key(key):
     """
-    Exports a private RSA key in OpenSSL PEM format.
+    Exports a private key in OpenSSL PEM format.
     """
     return key.private_bytes(Encoding.PEM, PrivateFormat.TraditionalOpenSSL, NoEncryption())
 

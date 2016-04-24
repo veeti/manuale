@@ -12,8 +12,8 @@ from .acme import Acme
 from .errors import ManualeError
 from .crypto import (
     generate_rsa_key,
-    load_rsa_key,
-    export_rsa_key,
+    load_private_key,
+    export_private_key,
     create_csr,
     load_csr,
     export_csr_for_acme,
@@ -34,7 +34,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
     if key_file:
         try:
             with open(key_file, 'rb') as f:
-                certificate_key = load_rsa_key(f.read())
+                certificate_key = load_private_key(f.read())
         except (ValueError, AttributeError, TypeError, IOError) as e:
             logger.error("Couldn't read certificate key.")
             raise ManualeError(e)
@@ -82,7 +82,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
 
         with open(key_path, 'wb') as f:
             os.chmod(key_path, 0o600)
-            f.write(export_rsa_key(certificate_key))
+            f.write(export_private_key(certificate_key))
             logger.info("Wrote key to {}".format(f.name))
 
         with open(cert_path, 'wb') as f:
@@ -102,7 +102,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
     except IOError as e:
         logger.error("Failed to write certificate or key. Going to print them for you instead.")
         logger.error("")
-        for line in export_rsa_key(certificate_key).decode('ascii').split('\n'):
+        for line in export_private_key(certificate_key).decode('ascii').split('\n'):
             logger.error(line)
         for line in export_pem_certificate(certificate).decode('ascii').split('\n'):
             logger.error(line)
