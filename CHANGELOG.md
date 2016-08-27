@@ -1,3 +1,9 @@
+# 1.0.3 (August 27, 2016)
+
+* Fixed handling of recycled authorizations: if a domain is already authorized, the server no longer allows reauthorizing it until expired.
+
+* Existing EC keys can now be used to issue certificates. (Support for generating EC keys is not yet implemented.)
+
 # 1.0.2 (March 20, 2016)
 
 * The authorization command now outputs proper DNS record lines.
