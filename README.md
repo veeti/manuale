@@ -18,8 +18,6 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 * Support for DNS validation. No need to figure out how to serve challenge files from a live domain. (In fact, that's the only validation method supported).
 
-* Authorization is separate from certificate issuance. Authorizations last for months on Let's Encrypt: there's no need to waste time validating the domain every time you renew the certificate.
-
 * Obviously, runs without root access. Use it from any machine you want, it doesn't care. Internet connection recommended.
 
 * Awful, undiscoverable name.

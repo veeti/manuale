@@ -1,7 +1,5 @@
 """
-The domain authorization command. Authorizations last up to 300 days on the
-production Let's Encrypt service at the time of writing, so it makes sense to
-separate certificate issuance from ownership verification.
+The domain authorization command.
 """
 
 import logging
@@ -28,6 +26,11 @@ def authorize(server, account, domains):
             auth = created.contents
             auth['uri'] = created.uri
 
+            # Check if domain is already authorized
+            if auth.get('status') == 'valid':
+                logger.info("{} is already authorized until {}.".format(domain, auth.get('expires', '(unknown)')))
+                continue
+
             # Find the DNS challenge
             try:
                 auth['challenge'] = [ch for ch in auth.get('challenges', []) if ch.get('type') == 'dns-01'][0]
@@ -41,18 +44,23 @@ def authorize(server, account, domains):
 
             authz[domain] = auth
 
+        # Quit if nothing to authorize
+        if not authz:
+            logger.info("")
+            logger.info("All domains are already authorized, exiting.")
+            return
+
         logger.info("")
         logger.info("DNS verification required. Make sure these TXT records are in place:")
         logger.info("")
-        for domain in domains:
-            auth = authz[domain]
+        for domain, auth in authz.items():
             logger.info("  _acme-challenge.{}.  IN TXT  \"{}\"".format(domain, auth['txt_record']))
         logger.info("")
         input("Press enter to continue.")
 
         # Verify each domain
         done, failed = set(), set()
-        for domain in domains:
+        for domain in authz.keys():
             logger.info("")
             auth = authz[domain]
             challenge = auth['challenge']
