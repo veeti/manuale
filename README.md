@@ -16,7 +16,7 @@ Isn't the point of Let's Encrypt to be automatic and seamless? Maybe, but here's
 
 * Simple interface with no hoops to jump through. Keys and certificate signing requests are automatically generated: no more cryptic OpenSSL one-liners. (However, you do need to know what to do with generated certificates and keys yourself!)
 
-* Support for DNS validation. No need to figure out how to serve challenge files from a live domain. (In fact, that's the only validation method supported).
+* Support for DNS & HTTP validation. No need to figure out how to serve challenge files from a live domain.
 
 * Obviously, runs without root access. Use it from any machine you want, it doesn't care. Internet connection recommended.
 
