@@ -8,25 +8,36 @@ import os
 from .account import Account
 from .acme import Acme
 from .errors import ManualeError, AccountAlreadyExistsError
-from .crypto import generate_rsa_key
+from .crypto import (
+    generate_rsa_key,
+    load_private_key,
+)
 from .helpers import confirm
 
 logger = logging.getLogger(__name__)
 
-def register(server, account_path, email):
+def register(server, account_path, email, key_file):
     # Don't overwrite silently
     if os.path.exists(account_path):
-        if not confirm("The account file {} already exists. Continuing will overwrite it with a new key. Continue?".format(account_path), default=False):
+        if not confirm("The account file {} already exists. Continuing will overwrite it with the new key. Continue?".format(account_path), default=False):
             raise ManualeError("Aborting.")
 
     # Confirm e-mail
     if not confirm("You're about to register a new account with the e-mail {}. Continue?".format(email)):
         raise ManualeError("Aborting.")
 
-    # Generate the account key
-    logger.info("Generating a new account key. This might take a second.")
-    account = Account(key=generate_rsa_key(4096))
-    logger.info("Key generated.")
+    # Load key or generate
+    if key_file:
+        try:
+            with open(key_file, 'rb') as f:
+                account = Account(key=load_private_key(f.read()))
+        except (ValueError, AttributeError, TypeError, IOError) as e:
+            logger.error("Couldn't read key.")
+            raise ManualeError(e)
+    else:
+        logger.info("Generating a new account key. This might take a second.")
+        account = Account(key=generate_rsa_key(4096))
+        logger.info("Key generated.")
 
     # Register
     acme = Acme(server, account)

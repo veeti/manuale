@@ -94,7 +94,12 @@ DEFAULT_CERT_KEY_SIZE = 2048
 
 # Command handlers
 def _register(args):
-    register(args.server, args.account, args.email)
+    register(
+        server=args.server,
+        account_path=args.account,
+        email=args.email,
+        key_file=args.key_file
+    )
 
 def _authorize(args):
     account = load_account(args.account)
@@ -162,6 +167,7 @@ def main():
         formatter_class=Formatter,
     )
     register.add_argument('email', type=str, help="Account e-mail address")
+    register.add_argument('--key-file', '-k', help="Existing key file to use for the account")
     register.set_defaults(func=_register)
 
     # Domain verification
