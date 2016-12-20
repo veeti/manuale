@@ -36,6 +36,10 @@ Python 3.3 or above is required.
 
 * Package maintainers wanted: your package here?
 
+### Using Docker
+
+There is a Docker image on the [Docker Hub](https://hub.docker.com/r/jgiannuzzi/letsencrypt-manuale/).
+
 ### Using pip
 
 You can install the package from [PyPI](https://pypi.python.org/pypi/manuale) using the `pip` tool. To do so, run `pip3 install manuale`.
