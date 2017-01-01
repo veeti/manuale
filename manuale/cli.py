@@ -39,8 +39,8 @@ contains your private key, and you need it to get certificates!
 
 DESCRIPTION_AUTHORIZE = \
 """
-Authorizes a domain or multiple domains for your account through DNS
-verification. You will need to set DNS records as prompted.
+Authorizes a domain or multiple domains for your account through DNS or HTTP
+verification. You will need to set up DNS records or HTTP files as prompted.
 
 After authorizing a domain, you can issue certificates for it. Authorizations
 can last for a long time, so you might not need to do this every time you want
@@ -98,7 +98,7 @@ def _register(args):
 
 def _authorize(args):
     account = load_account(args.account)
-    authorize(args.server, account, args.domain)
+    authorize(args.server, account, args.domain, args.method)
 
 def _issue(args):
     account = load_account(args.account)
@@ -172,6 +172,11 @@ def main():
         formatter_class=Formatter,
     )
     authorize.add_argument('domain', help="One or more domain names to authorize", nargs='+')
+    authorize.add_argument('--method',
+                           '-m',
+                           help="Authorization method",
+                           choices=('dns', 'http'),
+                           default='dns')
     authorize.set_defaults(func=_authorize)
 
     # Certificate issuance
