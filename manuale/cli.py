@@ -47,9 +47,8 @@ can last for a long time, so you might not need to do this every time you want
 a new certificate.  This depends on the server being used. You should see an
 expiration date for the authorization after completion.
 
-ACME does not currently provide a read-only mechanism for determining if a
-domain is already authorized. This means that you might go through this even if
-you don't need to.
+If a domain is already authorized, the authorization's expiration date will be
+printed.
 """
 
 DESCRIPTION_ISSUE = \
