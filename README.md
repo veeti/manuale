@@ -34,6 +34,8 @@ Python 3.3 or above is required.
 
 * Fedora Linux: `dnf install manuale`.
 
+* [Gentoo Linux](https://packages.gentoo.org/packages/app-crypt/manuale).
+
 * Package maintainers wanted: your package here?
 
 ### Using pip
