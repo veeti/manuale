@@ -16,7 +16,7 @@ except:
 
 setup(
     name='manuale',
-    version='1.0.3',
+    version='1.1.0',
 
     license='MIT',
     description="A fully manual Let's Encrypt/ACME client",

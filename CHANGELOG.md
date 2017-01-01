@@ -1,3 +1,11 @@
+# 1.1.0 (January 1, 2017)
+
+* Added support for HTTP authorization. (contributed by GitHub user @mbr)
+
+* Added support for registration with an existing key. (contributed by GitHub user @haddoncd)
+
+* Using an existing CSR no longer requires the private key. (contributed by GitHub user @eroen)
+
 # 1.0.3 (August 27, 2016)
 
 * Fixed handling of recycled authorizations: if a domain is already authorized, the server no longer allows reauthorizing it until expired.
