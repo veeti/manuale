@@ -30,7 +30,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
     if not output_path or output_path == '.':
         output_path = os.getcwd()
 
-    # Load key or generate
+    # Load key if given
     if key_file:
         try:
             with open(key_file, 'rb') as f:
@@ -39,10 +39,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
             logger.error("Couldn't read certificate key.")
             raise ManualeError(e)
     else:
-        logger.info("Generating a {} bit RSA key. This might take a second.".format(key_size))
-        certificate_key = generate_rsa_key(key_size)
-        logger.info("Key generated.")
-        logger.info("")
+        certificate_key = None
 
     # Load CSR or generate
     if csr_file:
@@ -53,6 +50,13 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
             logger.error("Couldn't read CSR.")
             raise ManualeError(e)
     else:
+        # Generate key
+        if not key_file:
+            logger.info("Generating a {} bit RSA key. This might take a second.".format(key_size))
+            certificate_key = generate_rsa_key(key_size)
+            logger.info("Key generated.")
+            logger.info("")
+
         csr = create_csr(certificate_key, domains)
 
     acme = Acme(server, account)
@@ -80,10 +84,11 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
         intermediate_path = os.path.join(output_path, domains[0] + '.intermediate.crt')
         key_path = os.path.join(output_path, domains[0] + '.pem')
 
-        with open(key_path, 'wb') as f:
-            os.chmod(key_path, 0o600)
-            f.write(export_private_key(certificate_key))
-            logger.info("Wrote key to {}".format(f.name))
+        if certificate_key is not None:
+            with open(key_path, 'wb') as f:
+                os.chmod(key_path, 0o600)
+                f.write(export_private_key(certificate_key))
+                logger.info("Wrote key to {}".format(f.name))
 
         with open(cert_path, 'wb') as f:
             f.write(export_pem_certificate(certificate))
@@ -102,8 +107,9 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
     except IOError as e:
         logger.error("Failed to write certificate or key. Going to print them for you instead.")
         logger.error("")
-        for line in export_private_key(certificate_key).decode('ascii').split('\n'):
-            logger.error(line)
+        if certificate_key is not None:
+            for line in export_private_key(certificate_key).decode('ascii').split('\n'):
+                logger.error(line)
         for line in export_pem_certificate(certificate).decode('ascii').split('\n'):
             logger.error(line)
         raise ManualeError(e)
