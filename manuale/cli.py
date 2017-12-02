@@ -113,7 +113,8 @@ def _issue(args):
         key_size=args.key_size,
         key_file=args.key_file,
         csr_file=args.csr_file,
-        output_path=args.output
+        output_path=args.output,
+        must_staple=args.ocsp_must_staple,
     )
 
 def _revoke(args):
@@ -196,7 +197,15 @@ def main():
     issue.add_argument('--key-file', '-k', help="Existing key file to use for the certificate")
     issue.add_argument('--csr-file', help="Existing signing request to use")
     issue.add_argument('--output', '-o', help="The output directory for created objects", default='.')
-    issue.set_defaults(func=_issue)
+    issue.add_argument('--ocsp-must-staple',
+                       dest='ocsp_must_staple',
+                       help="CSR: Request OCSP Must-Staple extension",
+                       action='store_true')
+    issue.add_argument('--no-ocsp-must-staple',
+                       dest='ocsp_must_staple',
+                       help=argparse.SUPPRESS,
+                       action='store_false')
+    issue.set_defaults(func=_issue, ocsp_must_staple=False)
 
     # Certificate revocation
     revoke = subparsers.add_parser(

@@ -39,7 +39,7 @@ setup(
 
     packages=['manuale'],
     install_requires=[
-        'cryptography >= 1.0',
+        'cryptography >= 2.1',
         'requests',
     ],
 
