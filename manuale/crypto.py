@@ -107,7 +107,7 @@ def export_private_key(key):
     """
     return key.private_bytes(Encoding.PEM, PrivateFormat.TraditionalOpenSSL, NoEncryption())
 
-def create_csr(key, domains):
+def create_csr(key, domains, must_staple=False):
     """
     Creates a CSR in DER format for the specified key and domain names.
     """
@@ -117,8 +117,11 @@ def create_csr(key, domains):
     ])
     san = x509.SubjectAlternativeName([x509.DNSName(domain) for domain in domains])
     csr = x509.CertificateSigningRequestBuilder().subject_name(name) \
-        .add_extension(san, critical=False) \
-        .sign(key, hashes.SHA256(), default_backend())
+        .add_extension(san, critical=False)
+    if must_staple:
+        ocsp_must_staple = x509.TLSFeature(features=[x509.TLSFeatureType.status_request])
+        csr = csr.add_extension(ocsp_must_staple, critical=False)
+    csr = csr.sign(key, hashes.SHA256(), default_backend())
     return export_csr_for_acme(csr)
 
 def export_csr_for_acme(csr):

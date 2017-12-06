@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 EXPIRATION_FORMAT = "%Y-%m-%d"
 
-def issue(server, account, domains, key_size, key_file=None, csr_file=None, output_path=None):
+def issue(server, account, domains, key_size, key_file=None, csr_file=None, output_path=None, must_staple=False):
     if not output_path or output_path == '.':
         output_path = os.getcwd()
 
@@ -57,7 +57,7 @@ def issue(server, account, domains, key_size, key_file=None, csr_file=None, outp
             logger.info("Key generated.")
             logger.info("")
 
-        csr = create_csr(certificate_key, domains)
+        csr = create_csr(certificate_key, domains, must_staple=must_staple)
 
     acme = Acme(server, account)
     try:
