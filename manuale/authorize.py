@@ -106,7 +106,7 @@ def authorize(server, account, domains, method):
 
         # Wait for the user to complete the challenges
         logger.info("")
-        input("Press enter to continue.")
+        input("Press Enter to continue.")
 
         # Validate challenges
         done, failed = set(), set()
