@@ -71,7 +71,7 @@ Authorize one or more domains:
     $ manuale authorize example.com
     DNS verification required. Make sure these records are in place:
       _acme-challenge.example.com. IN TXT "(some random gibberish)"
-    Press enter to continue.
+    Press Enter to continue.
     ...
     1 domain(s) authorized. Let's Encrypt!
 
